@@ -2,7 +2,7 @@
 CC = gcc
 CFLAGS = -O0
 LIBS = -li2c -lcrypto
-TARGETS = encrypt_tool factory_update get_py_output read_device upload_pyscript user_write_tool
+TARGETS = get_py_output read_device upload_pyscript user_write_tool
 
 all: check_deps $(TARGETS)
 

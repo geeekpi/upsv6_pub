@@ -1,0 +1,75 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before submitting, please verify that:**
+        - You're using the latest firmware version
+        - You've read the relevant documentation
+        - The error is not caused by custom Python code
+
+  - type: input
+    attributes:
+      label: SBC Model
+      description: What Single Board Computer are you using?
+      placeholder: e.g., Raspberry Pi 4B, Orange Pi 5, Jetson Nano...
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Host OS
+      description: What operating system are you running?
+      placeholder: e.g., Raspberry Pi OS 11 (bullseye), Ubuntu 22.04, Armbian 23.02...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Please describe exactly how to reproduce the issue
+      placeholder: |
+        1. First action
+        2. Second action
+        3. Error occurs
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Any other useful information (logs, screenshots, environment details)
+      placeholder: |
+        Please provide:
+        - Relevant logs or error messages
+        - Screenshots (if applicable)
+        - Any other environment details
+
+  - type: checkboxes
+    attributes:
+      label: Confirmations
+      description: Please verify the following
+      options:
+        - label: I'm using the latest firmware version
+          required: true
+        - label: I've read the relevant documentation
+          required: true
+        - label: This error is not caused by custom Python code
+          required: true

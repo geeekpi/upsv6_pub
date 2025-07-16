@@ -22,3 +22,4 @@ def write_i2c_register(address, register, data):
 
 if __name__ == "__main__":
     write_i2c_register(I2C_ADDR, OTA_REGISTER_ADDR, DATA)
+    print("Now, your UPS v6 entered OTA mode, please update your firmware by using user_wirte_tool. ")

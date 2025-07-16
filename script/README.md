@@ -58,7 +58,7 @@ pip install smbus2
 This script will gather all information about UPSv6 and print out everything(for expert only) 
 
 ## About script folder
-
+<pre>
 .
 ├── enable_ota.py
 ├── get_py_output.c
@@ -71,3 +71,4 @@ This script will gather all information about UPSv6 and print out everything(for
 ├── upload_pyscript.c
 ├── upsv6-user-app-demo-code.png
 └── user_write_tool.c
+</pre>

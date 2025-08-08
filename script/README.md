@@ -49,18 +49,27 @@ pip install smbus2
 
 ## Output Demo
 
-* Normal Use: `basic_information_upsv6.py`
-
-![Demo](./upsv6-user-app-demo-code.png)
-
-* Advanced Use: `advanced_information_upsv6.py`
-
-This script will gather all information about UPSv6 and print out everything(for expert only) 
 
 ## About script folder
+
 <pre>
 .
 ├── enable_ota.py
+├── encrypt_tool.c
+├── examples
+│   ├── test_color.py
+│   ├── test_drawCircle.py
+│   ├── test_drawFastVLine.py
+│   ├── test_drawLine.py
+│   ├── test_drawPixel.py
+│   ├── test_drawRect.py
+│   ├── test_drawString.py
+│   ├── test_drawTriangle.py
+│   ├── test_fillRect.py
+│   ├── test_fillScreen.py
+│   ├── test_fillTriangle.py
+│   └── tfttest.py
+├── factory_update.c
 ├── get_py_output.c
 ├── main.py
 ├── Makefile
@@ -68,7 +77,10 @@ This script will gather all information about UPSv6 and print out everything(for
 ├── read_device.c
 ├── read_device.py
 ├── README.md
+├── rpi.py
 ├── upload_pyscript.c
 ├── upsv6-user-app-demo-code.png
 └── user_write_tool.c
 </pre>
+
+

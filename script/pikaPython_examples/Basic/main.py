@@ -22,15 +22,9 @@ def get_runtime():
     return Device.getRuntime()
 
 
-def main():
-    """
-    Main function to run the script.
-    """
+while True:
     print("hello UPSv6:")
     check_memory()
     run_time = get_runtime()
     print(run_time)
-
-
-if __name__ == "__main__":
-    main()
+    Device.sleep(5000)

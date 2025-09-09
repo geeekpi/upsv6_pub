@@ -15,6 +15,13 @@ Basic  README.md  rpi.py  SATAPower  TFT_Module
 
 ### Getting Help
 
+> NOTE: Before you use `rpi.py`, please make sure your environment support `UTF-8`, if not, please execute following command first:
+
+```bash
+export PYTHONIOENCODING=utf-8
+```
+
+> Next:
 ```python
 pi@raspberrypi:~/upsv6_pub/script/pikaPython_examples $ python rpi.py -h
 usage: rpi.py [-h] [-u FILE] [-r] [--max-retry MAX_RETRY] [--retry-delay RETRY_DELAY]
@@ -48,4 +55,22 @@ Replace `<path_to_pikapython_script>` with the actual path to your PikaPython sc
 ```python
 python rpi.py -r 
 ```
+
+### Demostration 
+* UPS Basic Demo:
+```bash
+python rpi.py -u Basic/main.py 
+```
+
+![Basic](./imgs/basic_info.jpg)
+![feedback](./imgs/read_python_feedback.jpg)
+
+* TFT Module Demo:
+Upload a test code when you finished editing, which name is `test_drawString.py`
+
+```bash 
+python rpi.py -u test_drawString.py 
+```
+
+![UploadPikaPython](./imgs/rpi-upload.jpg)
 

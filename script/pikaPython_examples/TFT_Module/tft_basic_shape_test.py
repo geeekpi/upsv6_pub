@@ -1,9 +1,9 @@
 from UPS import TFTModule as tft
 from UPS import Device
 
-# init TFT
+# Init TFT module
 tft.init()
-print("1")
+
 
 def test_drawPixel():
     tft.drawPixel(10, 10, 0xF800)  # red pixel
@@ -58,20 +58,26 @@ def test_drawString():
     tft.drawString(10, 160, "FanSe 5", 0xFFFF, 0x07FF, 5)  # white，size 4
 
 # run all test
-test_drawPixel()
-print("2")
-test_drawLine()
-print("3")
-test_drawFastVLine()
-print("4")
-test_drawFastHLine()
-print("5")
-test_drawRect()
-print("6")
-test_drawCircle()
-test_fillRect()
-test_drawTriangle()
-test_fillTriangle()
-test_drawString()
+while True:
+    test_drawPixel()
+    Device.sleep(1000)
+    test_drawLine()
+    Device.sleep(1000)
+    test_drawFastVLine()
+    Device.sleep(1000)
+    test_drawFastHLine()
+    Device.sleep(1000)
+    test_drawRect()
+    Device.sleep(1000)
+    test_drawCircle()
+    Device.sleep(1000)
+    test_fillRect()
+    Device.sleep(1000)
+    test_drawTriangle()
+    Device.sleep(1000)
+    test_fillTriangle()
+    Device.sleep(1000)
+    test_drawString()
+    Device.sleep(1000)
 
 

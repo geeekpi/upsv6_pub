@@ -80,7 +80,7 @@ try:
             elif "CURRENT" in key:
                 print(f"* {key}: {RED}{value}mA{END_COLOR} ")
             elif "TEMPERATURE" in key:
-                print(f"* {key}: {GREEN}{value}℃{END_COLOR} ")
+                print(f"* {key}: {GREEN}{value}C{END_COLOR} ")
             elif "WHO_AM_I" in key:
                 print(f"* {key}: {value}")
             else:

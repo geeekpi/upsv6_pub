@@ -27,3 +27,10 @@ Navigate to `3 Interface Options` -> `I2C` -> `YES` -> `OK` -> `Finished`:
 * Step 3.
 <img width="1822" height="881" alt="image" src="https://github.com/user-attachments/assets/d20aa7da-c6e1-477d-a514-247abcd43cbf" />
 
+## More details 
+* [Firmware](./firmware/README.md)
+* [Script](./scirpt/README.md)
+* [UPS_Module_API_Instructions](./script/UPS_Module_API_Instructions.md)
+* [PikaPython_Examples_democodes](./script/pikaPython_examples/README.md)
+## Have fun!
+o(*￣▽￣*)ブ 

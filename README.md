@@ -1,5 +1,11 @@
 # UPS v6 Usage 
 
+## ChangeLog
+
+* Update new firmware Rev1.1 and adding support for those two expansion board. 
+* 2025/9/16 - adding SATA Power module power data reading function. It will read out the SATA Power board's (expansion board) 12V voltage, battery voltage, MCU voltage and current informations.
+* 2025/8/16 - adding TFT module (240x240pixel RGB TFT display) for displaying the information of UPSv6 via PikaPython Scripts.
+
 ## Step 1
 * Download repository by using git command, open a terminal and typing following command:
 ```bash

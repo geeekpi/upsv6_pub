@@ -29,7 +29,7 @@ Navigate to `3 Interface Options` -> `I2C` -> `YES` -> `OK` -> `Finished`:
 
 ## More details 
 * [Firmware](./firmware/README.md)
-* [Script](./scirpt/README.md)
+* [Script](./script/README.md)
 * [UPS_Module_API_Instructions](./script/UPS_Module_API_Instructions.md)
 * [PikaPython_Examples_democodes](./script/pikaPython_examples/README.md)
 * [TFT Module](./script/pikaPython_examples/TFT_Module/README.md)

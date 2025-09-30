@@ -36,6 +36,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass 
     finally: 
-        sp.getoutput("echo system will be reboot!")
-        sp.getoutput("sudo init 0")
-
+        #sp.getoutput("echo system will be reboot!")
+        #sp.getoutput("sudo init 0")
+        print("OK, you can upload new firmware right now, use `firmware_uploader` tool")

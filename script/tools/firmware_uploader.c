@@ -188,9 +188,9 @@ int main(int argc, char *argv[]) {
         total += bytes_read;
 
         // Show progress
-        printf("\n📊 Progress: %s / %s", 
-              bytes_to_human(total), 
-              bytes_to_human(file_size));
+        char totalBytes = bytes_to_human(total);        // we have to store the result inbetween the successive calls since the static local variable as return value overwrites total by file_size,
+        char fsizeBytes = bytes_to_human(file_size);    //      both values are always shown as equal values, no progress information. deHarro
+        printf("\n📊 Progress: %s / %s", totalBytes, fsizeBytes);
 
         // Wait for device ready
         int retry = 0;

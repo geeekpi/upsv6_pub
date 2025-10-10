@@ -36,5 +36,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass 
     finally: 
-        sp.getoutput("Do remember cut off power and remove the batteries and then insert the batteries and connect the power back again after OTA processing is finished!")
-
+        print("OK, you can upload new firmware right now, use `firmware_uploader` tool")

@@ -36,6 +36,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass 
     finally: 
-        sp.getoutput("echo system will be reboot!")
-        sp.getoutput("sudo init 0")
+        sp.getoutput("Do remember cut off power and remove the batteries and then insert the batteries and connect the power back again after OTA processing is finished!")
 

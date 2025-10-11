@@ -9,7 +9,14 @@
 #include <stddef.h>
 #include <time.h>
 
-#define DEVICE_ADDR 0x18
+#define TESTMODE		// if enabled -> no flashing to flash memory, only I2C communication and terminal output
+                        //  used for tweaking the progress bar, deHarro
+#ifdef TESTMODE
+	#define DEVICE_ADDR 0x17
+#else
+	#define DEVICE_ADDR 0x18
+#endif
+
 #define I2C_DEVICE "/dev/i2c-1"
 #define MAX_BUF_LEN 1024
 
@@ -90,16 +97,18 @@ int write_register_and_data(int fd, uint8_t ctrl, uint8_t *data, size_t size) {
     memcpy(buffer + 2, data, size);
 
     printf("\n✏️  Writing data...");
+#ifndef TESTMODE			// no I2C writing in TESTMODE
     ssize_t written = write(fd, buffer, size + 2);
     if (written != size + 2) {
         printf("\n❌ Write failed (expected %zu bytes, wrote %zd)\n", size+2, written);
         return -1;
     }
+#endif
     
     // Calculate transfer speed
     if (elapsed > 0) {
         double speed = size / elapsed / 1024;
-        printf("✅ Success | Speed: %.2f KB/s\n", speed);
+        printf("✅ Success | Speed: %.2f B/s\n", speed);
     } else {
         printf("✅ Success\n");
     }
@@ -107,13 +116,39 @@ int write_register_and_data(int fd, uint8_t ctrl, uint8_t *data, size_t size) {
     return 0;
 }
 
-// 计算最近的16的倍数
+// Calculate the nearest multiple of 16
 size_t round_up_to_multiple_of_16(size_t len)
 {
     return (len + 15) & ~15;
 }
 
+// print progressbar ---------------------------------------------------------------- deHarro
+// by Yusuf Savaş
+// taken from https://gist.github.com/amullins83/24b5ef48657c08c4005a8fab837b7499?permalink_comment_id=4554839#gistcomment-4554839
+void print_progress(size_t count, size_t max) 
+{
+    const int bar_width = PROGRESS_BAR_WIDTH;
+
+    float progress = (float)count / max;
+    int bar_length = progress * bar_width;
+
+    printf("\r\033[42;30m Progress: %.1f%% \033[0m [", progress * 100);
+    for (int i = 0; i < bar_length; ++i) {
+        printf("#");
+    }
+    for (int i = bar_length; i < bar_width; ++i) {
+        printf(" ");
+    }
+    printf("]");
+
+    fflush(stdout);
+}
+// \print progressbar ---------------------------------------------------------------- deHarro
+
 int main(int argc, char *argv[]) {
+
+    printf("\033[2;J");			// clear screen
+
     printf("\n🚀 Firmware Flasher Starting!\n");
     printf("============================\n");
 
@@ -167,6 +202,9 @@ int main(int argc, char *argv[]) {
 
     printf("\n🔥 Starting flash process!\n");
     while ((bytes_read = fread(buffer, 1, MAX_BUF_LEN, enc_file)) > 0) {
+
+	printf("\033[2;K");	// clear line to let progress bar stay fixed on last line, deHarro
+
         printf("\n----------------------\n");
         printf("📦 Processing block | Size: %zu bytes\n", bytes_read);
 
@@ -187,11 +225,16 @@ int main(int argc, char *argv[]) {
         }
         total += bytes_read;
 
-        // Show progress
-        printf("\n📊 Progress: %s / %s", 
-              bytes_to_human(total), 
-              bytes_to_human(file_size));
+        // Show progress	------------------------------------------------------
+	// workaround for passing static local pointer as return value, deHarro
+	char totalBytes[20];
+	strncpy(totalBytes, bytes_to_human(total), sizeof(bytes_to_human(total)));
 
+	printf("📊Progress: %s / %s\n", totalBytes, bytes_to_human(file_size));
+
+        print_progress(total, file_size);	// print semigrafic progressbar, deHarro
+
+#ifndef TESTMODE
         // Wait for device ready
         int retry = 0;
         printf("\n⏳ Waiting for device...");
@@ -217,6 +260,9 @@ int main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
             }
         }
+#else
+	sleep(1);
+#endif
     }
 
     // Send boot command

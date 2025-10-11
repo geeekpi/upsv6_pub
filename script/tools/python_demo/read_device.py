@@ -3,162 +3,174 @@ import struct
 from typing import NamedTuple
 from dataclasses import dataclass
 
-# 设备配置
-I2C_DEV = 3  # /dev/i2c-3
+# Device configuration
+I2C_DEV = 1  # /dev/i2c-3
 I2C_ADDR = 0x17
+
 
 @dataclass
 class DeviceStatus:
-    # 定义与C语言结构体对应的字段
-    WHO_AM_I: int  # 固定为0xA6
-    version: int  # 版本号(只读)
-    uuid0: int  # 唯一ID
+    # Define the fields corresponding to the C structure
+    WHO_AM_I: int  # Fixed to 0xA6
+    version: int  # Version number (read-only)
+    uuid0: int  # Unique ID
     uuid1: int
     uuid2: int
 
-    output_voltage: int  # 输出电压(5V)
-    input_voltage: int  # 输入电压
-    battery_voltage: int  # 电池电压
-    mcu_voltage: int  # MCU电压
-    output_current: int  # 输出电流(5V)
-    input_current: int  # 输入电流
-    battery_current: int  # 电池电流(负数为消耗,正数为充电)
-    temperature: int  # 温度
+    output_voltage: int  # Output voltage (5V)
+    input_voltage: int  # Input voltage
+    battery_voltage: int  # Battery voltage
+    mcu_voltage: int  # MCU voltage
+    output_current: int  # Output current (5V)
+    input_current: int  # Input current
+    battery_current: int  # Battery current (negative value indicates consumption, positive value indicates charging)
+    temperature: int  # Temperature
 
-    cr1: int  # 控制寄存器1
-    cr2: int  # 控制寄存器2
+    cr1: int  # Control register 1
+    cr2: int  # Control register 2
 
-    sr1: int  # 状态寄存器1
-    sr2: int  # 状态寄存器2
+    sr1: int  # Status register 1
+    sr2: int  # Status register 2
 
-    battery_protection_voltage: int  # 电池保护电压
-    shutdown_countdown: int  # 关机倒计时
-    auto_start_voltage: int  # 来电自启动电池电压阈值
-    pika_output_len: int  # Python 输出缓冲大小
-    ota_request: int  # 请求OTA
-    runtime: int  # 运行累计时间
-    charge_detect_interval_s: int  # 充电芯片触发间隔
-    led_ctl: int  # LED控制
+    battery_protection_voltage: int  # Battery protection voltage
+    shutdown_countdown: int  # Shutdown countdown
+    auto_start_voltage: int  # Battery voltage threshold for auto-start on incoming calls
+    pika_output_len: int  # Python output buffer size
+    ota_request: int  # Request OTA
+    runtime: int  # Cumulative runtime time
+    charge_detect_interval_s: int  # Charging chip trigger interval
+    led_ctl: int  # LED control
+
 
 def debug_print(status: DeviceStatus):
-    """打印设备状态信息"""
-    print("🌟 读取设备状态信息 🌟\n")
-    
-    # 打印每个字段
-    print(f"WHO_AM_I:                0x{status.WHO_AM_I:02X}")
-    print(f"版本号:                  0x{status.version:02X}")
-    print(f"UUID:                    0x{status.uuid0:08X} 0x{status.uuid1:08X} 0x{status.uuid2:08X}")
-    print(f"输出电压:                {status.output_voltage} mV")
-    print(f"输入电压:                {status.input_voltage} mV")
-    print(f"电池电压:                {status.battery_voltage} mV")
-    print(f"MCU电压:                 {status.mcu_voltage} mV")
-    print(f"输出电流:                {status.output_current} mA")
-    print(f"输入电流:                {status.input_current} mA")
-    print(f"电池电流:                {status.battery_current} mA")
-    print(f"温度:                    {status.temperature} °C")
+    """Print device status information"""
+    print("🌟 Read device status information 🌟\n")
 
-    print(f"控制寄存器1 (cr1):       0x{status.cr1:02X}")
-    print(f"    来电自启动模式       : {(status.cr1 >> 0) & 1}")
-    print(f"    加载Python代码       : {(status.cr1 >> 1) & 1}")
-    print(f"    运行Python代码       : {(status.cr1 >> 2) & 1}")
-    print(f"    读取Python输出日志   : {(status.cr1 >> 3) & 1}")
-    print(f"    预留未来             : {(status.cr1 >> 4) & 0xF}")
+    # Print each field
+    print(f"WHO_AM_I: 0x{status.WHO_AM_I:02X}")
+    print(f"Version number: 0x{status.version:02X}")
+    print(f"UUID: 0x{status.uuid0:08X} 0x{status.uuid1:08X} 0x{status.uuid2:08X}")
+    print(f"Output voltage: {status.output_voltage} mV")
+    print(f"Input voltage: {status.input_voltage} mV")
+    print(f"Battery voltage: {status.battery_voltage} mV")
+    print(f"MCU voltage: {status.mcu_voltage} mV")
+    print(f"Output current: {status.output_current} mA")
+    print(f"Input current: {status.input_current} mA")
+    print(f"Battery current: {status.battery_current} mA")
+    print(f"Temperature: {status.temperature} °C")
 
-    print(f"控制寄存器2 (cr2):       0x{status.cr2:02X}")
+    print(f"Control register 1 (cr1): 0x{status.cr1:02X}")
+    print(f"Incoming call auto-start mode: {(status.cr1 >> 0) & 1}")
+    print(f"Loading Python code: {(status.cr1 >> 1) & 1}")
+    print(f"Running Python code: {(status.cr1 >> 2) & 1}")
+    print(f"Reading Python output log: {(status.cr1 >> 3) & 1}")
+    print(f"Reserved for future use: {(status.cr1 >> 4) & 0xF}")
 
-    print(f"状态寄存器1 (sr1):       0x{status.sr1:02X}")
-    print(f"    5V输出状态           : {'开启' if (status.sr1 >> 0) & 1 else '关闭'}")
-    print(f"    快充模式             : {'慢充' if (status.sr1 >> 1) & 1 else '快充'}")
-    print(f"    充电状态             : {'放电' if (status.sr1 >> 2) & 1 else '充电'}")
-    print(f"    输入电压低           : {'低' if (status.sr1 >> 3) & 1 else '正常'}")
-    print(f"    输出电压低           : {'低' if (status.sr1 >> 4) & 1 else '正常'}")
-    print(f"    电池电压低           : {'低' if (status.sr1 >> 5) & 1 else '正常'}")
-    print(f"    ADC误差              : {'有' if (status.sr1 >> 6) & 1 else '正常'}")
-    print(f"    电池故障             : {'有' if (status.sr1 >> 7) & 1 else '无'}")
+    print(f"Control register 2 (cr2): 0x{status.cr2:02X}")
 
-    print(f"状态寄存器2 (sr2):       0x{status.sr2:02X}")
-    print(f"    Python代码过大       : {'是' if (status.sr2 >> 0) & 1 else '否'}")
+    print(f"Status register 1 (sr1): 0x{status.sr1:02X}")
+    print(f"5V output status : {'On' if (status.sr1 >> 0) & 1 else 'Off'}")
+    print(
+        f" Fast charge mode: {'Slow charge' if (status.sr1 >> 1) & 1 else 'Fast charge'}"
+    )
+    print(f" Charging status: {'Charging' if (status.sr1 >> 2) & 1 else 'Discharging'}")
+    print(f" Input voltage low: {'Low' if (status.sr1 >> 3) & 1 else 'Normal'}")
+    print(f" Output voltage low: {'Low' if (status.sr1 >> 4) & 1 else 'Normal'}")
+    print(f" Battery voltage low: {'Low' if (status.sr1 >> 5) & 1 else 'Normal'}")
+    print(f" ADC error: {'Yes' if (status.sr1 >> 6) & 1 else 'Normal'}")
+    print(f"Battery failure: {'Yes' if (status.sr1 >> 7) & 1 else 'No'}")
 
-    print(f"电池保护电压:           {status.battery_protection_voltage} mV")
-    print(f"关机倒计时:             {status.shutdown_countdown} s")
-    print(f"来电自启动电池电压阈值: {status.auto_start_voltage} mV")
-    print(f"Python 输出缓冲大小:    {status.pika_output_len} B")
-    print(f"请求OTA:                0x{status.ota_request:04X}")
-    print(f"累计运行时间:           {status.runtime} 毫秒")
-    print(f"充电芯片触发间隔:       {status.charge_detect_interval_s} 秒")
-    print(f"LED 控制:               0x{status.led_ctl:02X}")
+    print(f"Status register 2 (sr2): 0x{status.sr2:02X}")
+    print(f"Python code too large: {'Yes' if (status.sr2 >> 0) & 1 else 'No'}")
 
-    print("LED状态解析")
-    # LED控制解析
-    print(f"    I2C通信发生时点亮   : {(status.led_ctl >> 0) & 1}")
-    print(f"    电池充电时点亮       : {(status.led_ctl >> 1) & 1}")
-    print(f"    电池放电时点亮       : {(status.led_ctl >> 2) & 1}")
-    print(f"    故障时点亮           : {(status.led_ctl >> 3) & 1}")
-    print(f"    正常工作时点亮       : {(status.led_ctl >> 4) & 1}")
+    print(f"Battery protection voltage: {status.battery_protection_voltage} mV")
+    print(f"Shutdown countdown: {status.shutdown_countdown} s")
+    print(
+        f"Incoming call auto-start battery voltage threshold: {status.auto_start_voltage} mV"
+    )
+    print(f"Python output buffer size: {status.pika_output_len} B")
+    print(f"OTA request: 0x{status.ota_request:04X}")
+    print(f"Cumulative running time: {status.runtime} milliseconds")
+    print(f"Charging chip trigger interval: {status.charge_detect_interval_s} seconds")
+    print(f"LED control: 0x{status.led_ctl:02X}")
+
+    print("LED status analysis")
+    # LED control analysis
+    print(f" Turns on when I2C communication occurs: {(status.led_ctl >> 0) & 1}")
+    print(f" Turns on when the battery is charging: {(status.led_ctl >> 1) & 1}")
+    print(f" Turns on when the battery is discharging: {(status.led_ctl >> 2) & 1}")
+    print(f" Turns on when a fault occurs: {(status.led_ctl >> 3) & 1}")
+    print(
+        f" Turns on when the device is operating normally: {(status.led_ctl >> 4) & 1}"
+    )
+
 
 def read_device_status() -> DeviceStatus:
-    """读取设备状态"""
-    # 定义结构体格式 (小端，与C结构体一致)
+    """Read device status"""
+    # Define structure format (little endian, consistent with C structure)
     # B: uint8_t, H: uint16_t, I: uint32_t, Q: uint64_t, h: int16_t, b: int8_t
-    fmt = '<'  # 小端
-    fmt += 'B'  # WHO_AM_I
-    fmt += 'B'  # version
-    fmt += 'III'  # uuid0-2
-    fmt += 'HHHHHH'  # output_voltage, input_voltage, battery_voltage, mcu_voltage, output_current, input_current
-    fmt += 'h'  # battery_current
-    fmt += 'b'  # temperature
-    fmt += 'BB'  # cr1, cr2
-    fmt += 'BB'  # sr1, sr2
-    fmt += 'HHHHH'  # battery_protection_voltage, shutdown_countdown, auto_start_voltage, pika_output_len, ota_request
-    fmt += 'Q'  # runtime
-    fmt += 'H'  # charge_detect_interval_s
-    fmt += 'B'  # led_ctl
-    
-    # 计算结构体大小
+    fmt = "<"  # Little endian
+    fmt += "B"  # WHO_AM_I
+    fmt += "B"  # version
+    fmt += "III"  # uuid0-2
+    fmt += "HHHHHH"  # output_voltage, input_voltage, battery_voltage, mcu_voltage, output_current, input_current
+    fmt += "h"  # battery_current
+    fmt += "b"  # temperature
+    fmt += "BB"  # cr1, cr2
+    fmt += "BB"  # sr1, sr2
+    fmt += "HHHHH"  # battery_protection_voltage, shutdown_countdown, auto_start_voltage, pika_output_len, ota_request
+    fmt += "Q"  # runtime
+    fmt += "H"  # charge_detect_interval_s
+    fmt += "B"  # led_ctl
+
+    # Calculate structure size
     struct_size = struct.calcsize(fmt)
-    print(f"结构体大小: {struct_size} 字节")
-    
-    # 初始化I2C总线
+    print(f"Structure size: {struct_size} bytes")
+
+    # Initialize the I2C bus
     bus = smbus2.SMBus(I2C_DEV)
-    
-    # 分多次读取数据，每次最多32字节
+
+    # Read data in multiple passes, up to 32 bytes each
     data = bytearray()
     for offset in range(0, struct_size, 32):
-        # 计算本次读取的长度
+        # Calculate the length of this read
         read_len = min(32, struct_size - offset)
-        
+
         try:
-            # 使用SMBus读取块数据
+            # Read block data using SMBus
             block_data = bus.read_i2c_block_data(I2C_ADDR, offset, read_len)
-            
-            # 添加到数据缓冲区
+
+            # Add to data buffer
             data.extend(block_data)
-            print(f"📝 从地址0x{offset:02X}读取到数据: {len(block_data)} 字节")
+            print(f"📝 Read data from address 0x{offset:02X}: {len(block_data)} bytes")
         except Exception as e:
-            print(f"❌ 读取地址0x{offset:02X}时出错: {e}")
-            # 填充0以保证数据长度正确
+            print(f"❌ Error reading address 0x{offset:02X}: {e}")
+            # Pad with zeros to ensure data length is correct
             data.extend(bytes([0] * read_len))
-    
-    # 检查数据长度是否正确
+
+    # Check data length is correct
     if len(data) < struct_size:
-        print(f"⚠️ 数据不足，期望 {struct_size} 字节，实际 {len(data)} 字节")
-        # 填充0
+        print(
+            f"⚠️ Insufficient data, expected {struct_size} bytes, received {len(data)} bytes"
+        )
+        # Pad with zeros
         data.extend(bytes([0] * (struct_size - len(data))))
-    
-    # 解包数据到结构体
+
+    # Unpack data into a structure
     try:
         unpacked = struct.unpack(fmt, data[:struct_size])
         return DeviceStatus(*unpacked)
     except Exception as e:
-        print(f"❌ 解包数据时出错: {e}")
-        print(f"数据长度: {len(data)} 字节")
-        print(f"格式字符串: {fmt} (需要 {struct_size} 字节)")
+        print(f"❌ Error unpacking data: {e}")
+        print(f"Data length: {len(data)} bytes")
+        print(f"Format string: {fmt} (expected {struct_size} bytes)")
         raise
 
-if __name__ == '__main__':
-    print("🔄 开始读取设备数据...")
+
+if __name__ == "__main__":
+    print("🔄 Start reading device data...")
     try:
         status = read_device_status()
         debug_print(status)
     except Exception as e:
-        print(f"❌ 读取设备数据时出错: {e}")
+        print(f"❌ Error reading device data: {e}")

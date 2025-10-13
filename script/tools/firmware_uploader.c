@@ -9,7 +9,8 @@
 #include <stddef.h>
 #include <time.h>
 
-//#define TESTMODE		// if enabled no flashing, only I2C communication and terminal output
+//#define TESTMODE		// if enabled -> no flashing to flash memory, only I2C communication and terminal output
+                        //  used for tweaking the progress bar, deHarro
 #ifdef TESTMODE
 	#define DEVICE_ADDR 0x17
 #else
@@ -121,26 +122,28 @@ size_t round_up_to_multiple_of_16(size_t len)
     return (len + 15) & ~15;
 }
 
-// print progressbar ----------------------------------------------------------------
+// print progressbar ---------------------------------------------------------------- deHarro
+// by Yusuf Savaş
+// taken from https://gist.github.com/amullins83/24b5ef48657c08c4005a8fab837b7499?permalink_comment_id=4554839#gistcomment-4554839
 void print_progress(size_t count, size_t max) 
 {
-    const int bar_width = 50;
+    const int bar_width = PROGRESS_BAR_WIDTH;
 
     float progress = (float)count / max;
     int bar_length = progress * bar_width;
 
-    printf("\rProgress: [");
+    printf("\r\033[42;30m Progress: %.1f%% \033[0m [", progress * 100);
     for (int i = 0; i < bar_length; ++i) {
         printf("#");
     }
     for (int i = bar_length; i < bar_width; ++i) {
         printf(" ");
     }
-    printf("] %.1f%%", progress * 100);
+    printf("]");
 
     fflush(stdout);
 }
-// \print progressbar ---------------------------------------------------------------
+// \print progressbar ---------------------------------------------------------------- deHarro
 
 int main(int argc, char *argv[]) {
 
@@ -199,6 +202,9 @@ int main(int argc, char *argv[]) {
 
     printf("\n🔥 Starting flash process!\n");
     while ((bytes_read = fread(buffer, 1, MAX_BUF_LEN, enc_file)) > 0) {
+
+	printf("\033[2;K");	// clear line to let progress bar stay fixed on last line, deHarro
+
         printf("\n----------------------\n");
         printf("📦 Processing block | Size: %zu bytes\n", bytes_read);
 
@@ -220,15 +226,13 @@ int main(int argc, char *argv[]) {
         total += bytes_read;
 
         // Show progress	------------------------------------------------------
-        //printf("\033[2;J");			// clear screen
-        //printf("\033[1;1;H");			// cursor to pos 1,1
+	// workaround for passing static local pointer as return value, deHarro
+	char totalBytes[20];
+	strncpy(totalBytes, bytes_to_human(total), sizeof(bytes_to_human(total)));
 
-        char totalBytes[20];	// workaround for passing static local pointer as return value
-        strncpy(totalBytes, bytes_to_human(total), sizeof(bytes_to_human(total)));
+	printf("📊Progress: %s / %s\n", totalBytes, bytes_to_human(file_size));
 
-        printf("📊 Progress: %s / %s\n", totalBytes, bytes_to_human(file_size));
-
-        print_progress(total, file_size);	// print some sort of progressbar, deHarro
+        print_progress(total, file_size);	// print semigrafic progressbar, deHarro
 
 #ifndef TESTMODE
         // Wait for device ready

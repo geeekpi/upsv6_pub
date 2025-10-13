@@ -4,6 +4,8 @@ import time
 import os
 import sys
 import argparse
+import paho.mqtt.client as mqtt 
+import json
 
 # Device constants 📟
 DEVICE_ADDR = 0x17
@@ -13,6 +15,12 @@ PIKA_POP_REG = 59
 PIKA_PUTS_PTR_REG = 56
 CR1_REG_ADDR = 0x1D
 PYTHON_EXEC_BIT = 2
+
+# MQTT settings
+# MQTT_BROKER = "192.168.3.218"
+MQTT_BROKER = "127.0.0.1"
+MQTT_PORT = 1883 
+MQTT_TOPIC = "ups_status" 
 
 # Default retry settings 🔁
 DEFAULT_MAX_RETRY = 30
@@ -33,6 +41,16 @@ class RetryConfig:
         self.max_retry = max(max_retry, 1)
         self.retry_delay = max(retry_delay_ms / 1000.0, MIN_RETRY_DELAY_MS / 1000.0)  # Convert to seconds
         self.max_sub_retry = max(max_retry // 10, 1)
+
+
+def parse_frame_strict(tok: str):
+    if ILLEGAL.search(tok):
+        return None
+    m = NUM6.fullmatch(tok)
+    if not m:
+        return None
+    arr = [int(g) for g in m.groups()]
+
 
 def read_byte_data_with_retry(bus, address, register, retry_config):
     last_exception = None
@@ -146,18 +164,53 @@ def read_output(bus, retry_config):
             readback_value = (~ptr_value) & 0x7FFF  # 取反并确保最高位为0
             if not write_byte_with_retry(bus, DEVICE_ADDR, PIKA_PUTS_PTR_REG, ptr_value, retry_config, byte=False, readback=readback_value):
                 raise RuntimeError(f"❌ Failed to set output pointer to 0x{ptr_value:04X}")
-            # result.append(read_byte_data_with_retry(bus, DEVICE_ADDR, PIKA_POP_REG, retry_config))
             result.append(read_byte_data_with_retry(bus, DEVICE_ADDR, PIKA_POP_REG, retry_config))
 
         # Clear buffer
         if not write_byte_with_retry(bus, DEVICE_ADDR, PIKA_PUTS_PTR_REG, 0xFFFF, retry_config, byte=False, readback=0x00AA):
             raise RuntimeError("❌ Failed to clear output buffer")
-
+        print("Result:" + ''.join(chr(b) for b in result))
         print("📤 Device output:\n" + ''.join(chr(b) for b in result))
 
+        # Parse data and send data via MQTT
+        send_data_to_mqtt(''.join(chr(b) for b in result))
 
     except Exception as e:
         print(f"⚠️ Error while reading output: {str(e)}")
+
+def send_data_to_mqtt(data):
+    """Parse the data and send it via MQTT"""
+    mqtt_client = mqtt.Client()
+    mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+
+    # Parse the data 
+    try:
+        # split the data by lines and process each line 
+        # lines = data.split('\r\n')
+        BRACKETED = re.compile(r'\[.*?\]')
+        ILLEGAL = re.compile(r'[^\d\[\],\s+\-]')
+        NUM6 = re.compile(r'^\[\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*\]$')
+        lines = parse_frame_strict(NUM6)
+        print(lines)
+        for line in lines:
+            line = line.strip()
+        values = json.loads(line)   # convert the string to a list of integers 
+        values = eval(line)
+        labels = ["12V Output Voltage","12V Output Current","Battery Input Voltage",
+                  "Battery Input Current","5V Output Voltage","5V Output Current"]
+
+        # send each value as a separate MQTT message 
+        for i in range(6):
+            key = labels[i]
+            value = values[i]
+            mqtt_client.publish(f"MQTT_TOPIC/{key}", value)
+            print(f"✅ Sent to MQTT: {key}: {value} mV/A")
+    except Exception as e:
+        pass
+        # print(f"⚠️ Error while parsing and sending data: {str(e)}")
+
+    mqtt_client.disconnect()
+
 
 def main():
     parser = argparse.ArgumentParser(description='🧪 Communication tool for I2C devices')

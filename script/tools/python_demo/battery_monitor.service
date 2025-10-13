@@ -1,0 +1,11 @@
+[Unit]
+Description=Battery Monitor Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/upsv6_pub/script/tools/python_demo/battery_monitor.py
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

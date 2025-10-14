@@ -1,4 +1,4 @@
-# **Battery Voltage and Current Monitoring with Shutdown Trigger for 52Pi UPS V6 Using systemd**
+# **Battery Voltage and Current Monitoring with Shutdown Trigger for 52Pi UPS Gen 6 Using systemd**
 
 Here is the modified code, rewritten as a systemd service to monitor only the battery voltage and current. When the battery voltage drops below 7400mV(each battery 3700mV), it triggers a shutdown operation. The code has been optimized by removing unnecessary parts and adding detailed English comments. The monitoring interval is set to check every 2 minutes.
 

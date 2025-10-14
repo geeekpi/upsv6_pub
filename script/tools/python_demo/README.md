@@ -6,7 +6,7 @@ Here is the modified code, rewritten as a systemd service to monitor only the ba
 ```python
 #!/usr/bin/env python3
 """
-This script monitors the battery voltage and current of a 52Pi UPS V6 device.
+This script monitors the battery voltage and current of a 52Pi UPS Gen 6 device.
 If the battery voltage drops below 7400mV, it triggers a shutdown process.
 """
 

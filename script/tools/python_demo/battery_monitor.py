@@ -23,7 +23,7 @@ BATTERY_VOLTAGE_REG = 0x12
 BATTERY_CURRENT_REG = 0x1A
 
 # Threshold for battery voltage
-BATTERY_VOLTAGE_THRESHOLD = 3700  # in mV
+BATTERY_VOLTAGE_THRESHOLD = 7400  # in mV
 
 # Shutdown command
 SHUTDOWN_COMMAND = "sudo sync ; sudo init 0"

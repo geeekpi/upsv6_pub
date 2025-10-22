@@ -130,7 +130,7 @@ void debug_print(DeviceStatus* status) {
     printf("Power-on auto-start battery voltage threshold : %u mV\n", status->auto_start_voltage);
     printf("Reserved Register :    0x%04X\n", status->rsv);
     printf("Request OTA(Over-The-Air update) :   0x%04X\n", status->ota_request);
-    printf("Accumulated operating time :  %llu microseconds\n", status->runtime);
+    printf("Accumulated operating time :  %lu milliseconds\n", status->runtime);
     printf("Charging chip trigger interval :     %u seconds\n", status->charge_detect_interval_s);
     printf("LED Control:               0x%02X\n", status->led_ctl);
 

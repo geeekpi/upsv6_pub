@@ -122,6 +122,7 @@ To run this script as a systemd service, you need to create a systemd service fi
    [Service]
    ExecStart=/usr/bin/python3 /path/to/your/script/battery_monitor.py
    Restart=always
+   RestartSec=4
    User=pi
 
    [Install]

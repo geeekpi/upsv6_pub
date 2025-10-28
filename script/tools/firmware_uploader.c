@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <time.h>
 
-#define TESTMODE		// if enabled -> no flashing to flash memory, only I2C communication and terminal output
+//#define TESTMODE		// if enabled -> no flashing to flash memory, only I2C communication and terminal output
                         //  used for tweaking the progress bar, deHarro
 #ifdef TESTMODE
 	#define DEVICE_ADDR 0x17

@@ -5,6 +5,7 @@ After=network.target
 [Service]
 ExecStart=/usr/bin/python3 /home/pi/upsv6_pub/script/tools/python_demo/battery_monitor.py
 Restart=always
+RestartSec=4
 User=pi
 
 [Install]

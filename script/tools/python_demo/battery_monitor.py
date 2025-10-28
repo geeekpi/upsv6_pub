@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 This script monitors the battery voltage and current of a 52Pi UPS V6 device.
-If the battery voltage drops below 3700mV, it triggers a shutdown process.
+If the battery voltage drops below 7400 mV, it triggers a shutdown process.
 """
 
 from smbus2 import SMBus
 import time
 import subprocess
-import logging 
+import logging
 
 #define log file path
 LOG_FILE = "/var/log/battery_monitor.log"
@@ -21,9 +21,11 @@ DEVICE_ADDRESS = 0x17
 # Define registers address
 BATTERY_VOLTAGE_REG = 0x12
 BATTERY_CURRENT_REG = 0x1A
+INPUT_VOLTAGE_REG = 0x10
+INPUT_CURRENT_REG = 0x18
 
 # Threshold for battery voltage
-BATTERY_VOLTAGE_THRESHOLD = 7400  # in mV
+BATTERY_VOLTAGE_THRESHOLD = 3700  # in mV (value for 1 (one) battery cell!)
 
 # Shutdown command
 SHUTDOWN_COMMAND = "sudo sync ; sudo init 0"
@@ -50,17 +52,41 @@ def read_battery_status():
     battery_current = read_word_register(BATTERY_CURRENT_REG)
     return battery_voltage, battery_current
 
+# Read charger voltage and current
+def read_input_status():
+    """
+    Read the charger voltage and current from the device.
+    """
+    input_voltage = read_word_register(INPUT_VOLTAGE_REG)
+    input_current = read_word_register(INPUT_CURRENT_REG)
+    return input_voltage, input_current
+
 # Check battery status and trigger shutdown if necessary
 def check_battery_status():
     """
     Check the battery status and trigger shutdown if the voltage is below the threshold.
     """
-    battery_voltage, battery_current = read_battery_status()
-    logging.info(f"Battery Voltage: {battery_voltage}mV, Current: {battery_current}mA.")
-    
-    if battery_voltage < BATTERY_VOLTAGE_THRESHOLD:
-        logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown.")
-        logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown.")
+    badBattery = 0                                                   # flag for bad battery state
+    (battery_voltage, battery_current) = read_battery_status()
+    (input_voltage, input_current) = read_input_status()
+    logging.info(f"Battery Voltage: {battery_voltage} mV, Current: {battery_current} mA -- Input Voltage: {input_voltage} mV, Current: {input_current} mA.")
+
+    if (battery_voltage < BATTERY_VOLTAGE_THRESHOLD * 2):              # check for double the threshold, we have 2 batteries in series!
+        logging.info(f"Battery voltage {battery_voltage} mV is below {BATTERY_VOLTAGE_THRESHOLD} mV. Checking again...")
+
+        for x in range (0, 3):
+            (battery_voltage, battery_current) = read_battery_status() # reread battery voltage
+            if battery_voltage < BATTERY_VOLTAGE_THRESHOLD * 2:      # check again
+                logging.info(f"Battery voltage {battery_voltage} mV is still below {BATTERY_VOLTAGE_THRESHOLD} mV - badBat = {badBattery}")
+                badBattery = badBattery + 1                          # still bad battery state, increment flag
+            else:
+                logging.info(f"Battery voltage {battery_voltage} mV is OK - Aborting shutdown.")
+                badBattery = 0                                       # battery is OK, reset flag
+                break
+            time.sleep(1)                                                 # dont poll the registers too frequently
+
+    if (badBattery > 0):
+        logging.info(f"Battery voltage {battery_voltage} mV is below {BATTERY_VOLTAGE_THRESHOLD} mV. Initiating shutdown.")
         subprocess.run(SHUTDOWN_COMMAND, shell=True)
 
 # Main loop
@@ -71,7 +97,8 @@ def main():
     try:
         while True:
             check_battery_status()
-            time.sleep(120)  # Check every 2 minutes
+            # check_input_status()
+            time.sleep(60)  # Check every 1 minutes
     except KeyboardInterrupt:
         print("Exiting battery monitor script.")
     finally:

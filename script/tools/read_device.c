@@ -86,9 +86,17 @@ typedef struct __attribute__((packed)) {
 void debug_print(DeviceStatus* status) {
     printf("🌟 Read Device Status Information🌟\n");
 
-    // 打印每个字段
+    // Print each field
     printf("WHO_AM_I:             0x%02X\n", status->WHO_AM_I);
-    printf("Version:              0x%02X\n", status->version);
+    //status->version = 0b01100010 ; 				// for test purpose only, major: 0b011, minor: 0b00010 - should give "V3.2" as output
+    if(((status->version >> 5) & 0b00000111) > 0) 	// then we have the new definition of version with major/minor version
+    {
+        printf("Version:              V%d.%d\n", ((status->version >> 5) & 0b00000111), (status->version & 0b00011111));
+    }
+    else
+    {
+        printf("Version:              0x%02X\n", status->version);
+    }
     printf("UUID:                 0x%08X 0x%08X 0x%08X\n", status->uuid0, status->uuid1, status->uuid2);
     printf("Output Voltage:       %u mV\n", status->output_voltage);
     printf("Input Voltage:        %u mV\n", status->input_voltage);
@@ -122,7 +130,7 @@ void debug_print(DeviceStatus* status) {
     printf("Power-on auto-start battery voltage threshold : %u mV\n", status->auto_start_voltage);
     printf("Reserved Register :    0x%04X\n", status->rsv);
     printf("Request OTA(Over-The-Air update) :   0x%04X\n", status->ota_request);
-    printf("Accumulated operating time :  %llu microseconds\n", status->runtime);
+    printf("Accumulated operating time :  %lu milliseconds\n", status->runtime);
     printf("Charging chip trigger interval :     %u seconds\n", status->charge_detect_interval_s);
     printf("LED Control:               0x%02X\n", status->led_ctl);
 

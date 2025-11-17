@@ -16,6 +16,11 @@ rev1.0-efa805273c2e3dcc75291db4b8e685ad57a9b78d.bin
 - `rev1.0`: Firmware version number
 - `efa805...`: Full git commit hash used to build this firmware
 
+## ChangeLog 
+
+- `rev1.0`: Basic Function and TFT LCD display extension board support.
+- `rev1.1`: Fixed the LED register's customized function and `SATA Power board` extension board support.
+
 ## Important Notes
 
 1. **Automatic Builds**: All firmware binaries are built automatically from the source code.

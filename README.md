@@ -5,6 +5,9 @@
 * Update new firmware Rev1.1 and adding support for those two expansion board. 
 * 2025/9/16 - adding SATA Power module power data reading function. It will read out the SATA Power board's (expansion board) 12V voltage, battery voltage, MCU voltage and current informations.
 * 2025/8/16 - adding TFT module (240x240pixel RGB TFT display) for displaying the information of UPSv6 via PikaPython Scripts.
+* 2025/11/11 - adding SATA Power Board for external SATA disk's Power supply, it can offer 12V/5V power for dual SATA disk,(only power supply ,but not data transfering function, addition board required.(Such as 52pi N21 board) 
+* 2025/11/18 - adding shell script for UPS gen 6 register reading and configuring. 
+
 
 ## Step 1
 * Download repository by using git command, open a terminal and typing following command:

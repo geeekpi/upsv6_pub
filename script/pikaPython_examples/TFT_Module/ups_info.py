@@ -12,19 +12,19 @@ MAGENTA = 0xF81F
 CYAN = 0x07FF
 
 
-    tft.fillScreen(WHITE)
-    Device.sleep(200)
+tft.fillScreen(WHITE)
+Device.sleep(200)
 
-    # (x, y, string, front coloer, background color, font size)
-    tft.drawString(25, 40 , 'HELLO UPSv6', RED, WHITE, 3)
-    tft.drawString(5, 80 , 'UPSv6 Monitor', CYAN, WHITE, 3)
-    tft.fillRect(0, 120, 240, 20, RED)
-    tft.fillRect(0, 140, 240, 20, YELLOW)
-    tft.fillRect(0, 160, 240, 20, BLUE)
-    tft.fillRect(0, 180, 240, 20, GREEN)
-    tft.fillRect(0, 200, 240, 20, CYAN)
-    tft.fillRect(0, 220, 240, 20, MAGENTA)
-    Device.sleep(5000)
+# (x, y, string, front coloer, background color, font size)
+tft.drawString(25, 40 , 'HELLO UPSv6', RED, WHITE, 3)
+tft.drawString(5, 80 , 'UPSv6 Monitor', CYAN, WHITE, 3)
+tft.fillRect(0, 120, 240, 20, RED)
+tft.fillRect(0, 140, 240, 20, YELLOW)
+tft.fillRect(0, 160, 240, 20, BLUE)
+tft.fillRect(0, 180, 240, 20, GREEN)
+tft.fillRect(0, 200, 240, 20, CYAN)
+tft.fillRect(0, 220, 240, 20, MAGENTA)
+Device.sleep(5000)
 
 while True:
     ov = str(Device.getOutputVoltage())

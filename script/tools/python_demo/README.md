@@ -64,10 +64,14 @@ def check_battery_status():
     """
     battery_voltage, battery_current = read_battery_status()
     logging.info(f"Battery Voltage: {battery_voltage}mV, Current: {battery_current}mA")
-    
-    if battery_voltage < BATTERY_VOLTAGE_THRESHOLD:
-        logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown")
-        logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown")
+
+    check_times = 0
+    for i in range(3):
+        if battery_voltage < BATTERY_VOLTAGE_THRESHOLD:
+            logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown")
+            logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown")
+            check_times +=1
+    if check_times >= 3:
         subprocess.run(SHUTDOWN_COMMAND, shell=True)
 
 # Main loop

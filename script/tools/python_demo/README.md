@@ -148,10 +148,10 @@ sudo python3 battery_monitor.py
 ## Logging Format
 
 ```
-2024-01-15 14:30:45,123 - Battery Voltage: 7500 mV, Current: 500 mA -- Input Voltage: 5200 mV, Current: 1000 mA.
-2024-01-15 14:30:45,124 - Battery voltage 3650 mV is below 3700 mV. Checking again...
-2024-01-15 14:30:46,125 - Battery voltage 3640 mV is still below 3700 mV - badBat = 1
-2024-01-15 14:30:47,126 - Battery voltage 3630 mV is still below 3700 mV - badBat = 2
-2024-01-15 14:30:48,127 - Battery voltage 3620 mV is still below 3700 mV - badBat = 3
-2024-01-15 14:30:48,128 - Battery voltage 3620 mV is below 3700 mV. Initiating shutdown.
+2026-03-20 14:30:45,123 - Battery Voltage: 7500 mV, Current: 500 mA -- Input Voltage: 5200 mV, Current: 1000 mA.
+2026-03-20 14:30:45,124 - Battery voltage 3650 mV is below 3700 mV. Checking again...
+2026-03-20 14:30:46,125 - Battery voltage 3640 mV is still below 3700 mV - badBat = 1
+2026-03-20 14:30:47,126 - Battery voltage 3630 mV is still below 3700 mV - badBat = 2
+2026-03-20 14:30:48,127 - Battery voltage 3620 mV is still below 3700 mV - badBat = 3
+2026-03-20 14:30:48,128 - Battery voltage 3620 mV is below 3700 mV. Initiating shutdown.
 ```

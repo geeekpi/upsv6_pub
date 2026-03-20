@@ -1,164 +1,157 @@
-# **Battery Voltage and Current Monitoring with Shutdown Trigger for 52Pi UPS Gen 6 Using systemd**
+# 52Pi UPS Gen 6 Battery Monitor
 
-Here is the modified code, rewritten as a systemd service to monitor only the battery voltage and current. When the battery voltage drops below 7400mV(each battery 3700mV), it triggers a shutdown operation. The code has been optimized by removing unnecessary parts and adding detailed English comments. The monitoring interval is set to check every 2 minutes.
+## Overview
 
-### Modified Code
+This script monitors the battery voltage and current of a 52Pi UPS V6 device via I2C communication. It automatically triggers a system shutdown when the battery voltage drops below a critical threshold to prevent data loss.
+
+---
+
+## Dependencies
+
 ```python
-#!/usr/bin/env python3
-"""
-This script monitors the battery voltage and current of a 52Pi UPS Gen 6 device.
-If the battery voltage drops below 7400mV, it triggers a shutdown process.
-"""
-
-from smbus2 import SMBus
-import time
-import subprocess
-import logging 
-
-#define log file path
-LOG_FILE = "/var/log/battery_monitor.log"
-
-# configure logging settings
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(message)s')
-
-
-# Device address
-DEVICE_ADDRESS = 0x17
-
-# Define registers address
-BATTERY_VOLTAGE_REG = 0x12
-BATTERY_CURRENT_REG = 0x1A
-
-# Threshold for battery voltage
-BATTERY_VOLTAGE_THRESHOLD = 3700  # in mV
-
-# Shutdown command
-SHUTDOWN_COMMAND = "sudo sync ; sudo init 0"
-
-# Initialize SMBus
-bus = SMBus(1)  # 1 means I2C no.1 bus
-
-# Read 16-bit register
-def read_word_register(register_address):
-    """
-    Read a 16-bit register from the device.
-    """
-    value = bus.read_word_data(DEVICE_ADDRESS, register_address)
-    if value > 32767:
-        value -= 65536
-    return value
-
-# Read battery voltage and current
-def read_battery_status():
-    """
-    Read the battery voltage and current from the device.
-    """
-    battery_voltage = read_word_register(BATTERY_VOLTAGE_REG)
-    battery_current = read_word_register(BATTERY_CURRENT_REG)
-    return battery_voltage, battery_current
-
-# Check battery status and trigger shutdown if necessary
-def check_battery_status():
-    """
-    Check the battery status and trigger shutdown if the voltage is below the threshold.
-    """
-    battery_voltage, battery_current = read_battery_status()
-    logging.info(f"Battery Voltage: {battery_voltage}mV, Current: {battery_current}mA")
-
-    check_times = 0
-    for i in range(3):
-        if battery_voltage < BATTERY_VOLTAGE_THRESHOLD:
-            logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown")
-            logging.info(f"Battery voltage is below {BATTERY_VOLTAGE_THRESHOLD}mV. Initiating shutdown")
-            check_times +=1
-    if check_times >= 3:
-        subprocess.run(SHUTDOWN_COMMAND, shell=True)
-
-# Main loop
-def main():
-    """
-    Main loop to periodically check the battery status.
-    """
-    try:
-        while True:
-            check_battery_status()
-            time.sleep(120)  # Check every 2 minutes
-    except KeyboardInterrupt:
-        print("Exiting battery monitor script.")
-    finally:
-        bus.close()
-
-if __name__ == "__main__":
-    main()
+from smbus2 import SMBus      # I2C communication library
+import time                   # Time delays
+import subprocess             # System command execution
+import logging                # Event logging
 ```
 
-### Code Explanation
-1. **Optimization**:
-   - Removed unnecessary `read_byte_register` and `read_dword_register` functions, as only the battery voltage and current are monitored, both of which are 16-bit registers.
-   - Removed the redundant `read_all_registers` function and directly read the battery voltage and current in `check_battery_status`.
-   - Removed excess print statements, retaining only those for battery voltage and current.
+---
 
-2. **Monitoring Logic**:
-   - Checks the battery voltage and current every 2 minutes.
-   - If the battery voltage falls below 3700mV, it calls `subprocess.run` to execute the shutdown command.
+## Configuration Constants
 
-3. **Comments**:
-   - Added detailed English comments to explain the purpose of each function and the main logic.
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `LOG_FILE` | `"/var/log/battery_monitor.log"` | Path to log file |
+| `DEVICE_ADDRESS` | `0x17` | I2C device address of the UPS |
+| `BATTERY_VOLTAGE_REG` | `0x12` | Register address for battery voltage |
+| `BATTERY_CURRENT_REG` | `0x1A` | Register address for battery current |
+| `INPUT_VOLTAGE_REG` | `0x10` | Register address for input/charger voltage |
+| `INPUT_CURRENT_REG` | `0x18` | Register address for input/charger current |
+| `BATTERY_VOLTAGE_THRESHOLD` | `3700` | Minimum voltage per cell in mV |
+| `SHUTDOWN_COMMAND` | `"sudo sync ; sudo init 0"` | System shutdown command |
 
-### Creating a systemd Service
-To run this script as a systemd service, you need to create a systemd service file.
+---
 
-1. **Create the Service File**:
-   Create a service file in the `/etc/systemd/system/` directory, for example, `battery_monitor.service`.
+## Core Functions
 
-   ```bash
-   sudo nano /etc/systemd/system/battery_monitor.service
-   ```
+### `read_word_register(register_address)`
 
-2. **Edit the Service File**:
-   Add the following content to the file:
+Reads a 16-bit signed value from the specified I2C register.
 
-   ```ini
-   [Unit]
-   Description=Battery Monitor Service
-   After=network.target
+**Parameters:**
+- `register_address` — The I2C register to read from
 
-   [Service]
-   ExecStart=/usr/bin/python3 /path/to/your/script/battery_monitor.py
-   Restart=always
-   RestartSec=4
-   User=pi
+**Returns:** Signed 16-bit integer value
 
-   [Install]
-   WantedBy=multi-user.target
-   ```
+**Logic:**
+- Reads word data from device at `DEVICE_ADDRESS`
+- Converts unsigned 16-bit to signed (values > 32767 are adjusted by subtracting 65536)
 
-   - `ExecStart` specifies the path to the script.
-   - `Restart=always` ensures the service restarts automatically if it fails.
-   - `User=pi` specifies that the script runs as the `pi` user.
+---
 
-3. **Create log file and grant permissions**:
+### `read_battery_status()`
+
+Retrieves current battery voltage and current readings.
+
+**Returns:** Tuple of `(battery_voltage, battery_current)` in mV and mA
+
+---
+
+### `read_input_status()`
+
+Retrieves charger/input voltage and current readings.
+
+**Returns:** Tuple of `(input_voltage, input_current)` in mV and mA
+
+---
+
+### `check_battery_status()`
+
+Main monitoring logic that checks battery health and triggers shutdown if necessary.
+
+**Algorithm:**
+
+1. **Initial Read** — Read battery and input status, log values
+2. **Threshold Check** — Compare `battery_voltage` against `BATTERY_VOLTAGE_THRESHOLD * 2` (accounts for 2 series cells)
+3. **Verification Loop** — If below threshold:
+   - Enter retry loop (3 attempts)
+   - Re-read voltage each second
+   - Increment `badBattery` counter if still low
+   - Reset and abort if voltage recovers
+4. **Shutdown Decision** — If `badBattery > 0` after verification, execute `SHUTDOWN_COMMAND`
+
+---
+
+### `main()`
+
+Infinite monitoring loop with 60-second intervals.
+
+**Behavior:**
+- Runs `check_battery_status()` every 60 seconds
+- Graceful exit on `KeyboardInterrupt` (Ctrl+C)
+- Ensures I2C bus cleanup via `finally` block
+
+---
+
+## Execution Flow
+
+```
+┌─────────────────┐
+│   Initialize    │
+│   SMBus(1)      │
+└────────┬────────┘
+         ▼
+┌─────────────────┐     ┌─────────────────┐
+│ Read Battery &  │────▶│  Log Readings   │
+│ Input Status    │     └─────────────────┘
+└─────────────────┘                │
+         │                         ▼
+         │              ┌─────────────────┐
+         │              │ Voltage < 7400? │
+         │              │ (3700 × 2)      │
+         │              └─────────────────┘
+         │                         │
+    No ──┴─────────────────────────┘
+         │ Yes
+         ▼
+┌─────────────────┐
+│ Retry 3 Times   │
+│ (1s intervals)  │
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+┌───────┐ ┌─────────┐
+│ Still │ │ Recovers│
+│ Low   │ │         │
+└───┬───┘ └───┬─────┘
+    │         │
+    ▼         ▼
+┌─────────┐ ┌─────────┐
+│Shutdown │ │ Continue│
+│ Initiated│ │ Loop   │
+└─────────┘ └─────────┘
+```
+
+---
+
+## Usage
 
 ```bash
-sudo touch /var/log/battery_monitor.log
-sudo chown pi:pi /var/log/battery_monitor.log
-sudo chmod 664 /var/log/battery_monitor.log
+sudo python3 battery_monitor.py
 ```
 
-4. **Start the Service**:
-   After saving the file, run the following commands to start the service and enable it to start on boot:
+**Note:** Requires root privileges for I2C access and shutdown command execution.
 
-   ```bash
-   sudo systemctl daemon-reload
-   sudo systemctl enable battery_monitor.service
-   sudo systemctl start battery_monitor.service
-   ```
+---
 
-5. **Check Service Status**:
-   Use the following command to check the service status:
+## Logging Format
 
-   ```bash
-   sudo systemctl status battery_monitor.service
-   ```
-
-With this setup, the script will run as a systemd service, checking the battery voltage and current every 2 minutes and triggering a shutdown operation when the voltage falls below 7400mV.
+```
+2024-01-15 14:30:45,123 - Battery Voltage: 7500 mV, Current: 500 mA -- Input Voltage: 5200 mV, Current: 1000 mA.
+2024-01-15 14:30:45,124 - Battery voltage 3650 mV is below 3700 mV. Checking again...
+2024-01-15 14:30:46,125 - Battery voltage 3640 mV is still below 3700 mV - badBat = 1
+2024-01-15 14:30:47,126 - Battery voltage 3630 mV is still below 3700 mV - badBat = 2
+2024-01-15 14:30:48,127 - Battery voltage 3620 mV is still below 3700 mV - badBat = 3
+2024-01-15 14:30:48,128 - Battery voltage 3620 mV is below 3700 mV. Initiating shutdown.
+```

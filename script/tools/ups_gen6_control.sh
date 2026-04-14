@@ -44,7 +44,7 @@ write_register() {
 }
 
 main_menu() {
-    whiptail --title "UPS gen 6 I2C Register Control" --menu "Choose an option" 20 78 10 \
+    menuitem=$(whiptail --title "UPS gen 6 I2C Register Control" --menu "Choose an option" 20 78 10 \
         "1" "Read WHO_AM_I Register" \
         "2" "Read Version Number" \
         "3" "Read UUID" \
@@ -57,14 +57,13 @@ main_menu() {
         "10" "Request OTA Mode" \
         "11" "Configure Charge Detect Interval" \
         "12" "Configure LED Control" \
-        "13" "Exit" 3>&1 1>&2 2>&3  &1 > /tmp/menuitem
-        menuitem=$(< /tmp/menuitem)
-        if [ $? -ne 0 ]; then
-		clear
-                echo "User pressed Cancel or closed the dialog"
-                exit 1
-        fi
-        menuitem=$(< /tmp/menuitem)
+        "13" "Exit" 3>&1 1>&2 2>&3)
+    
+    if [ $? -ne 0 ]; then
+        clear
+        echo "User pressed Cancel or closed the dialog"
+        exit 1
+    fi
 }
 
 
@@ -87,7 +86,7 @@ while true; do
             uuid0=$(read_register $UUID0 w)
             uuid1=$(read_register $UUID1 w)
             uuid2=$(read_register $UUID2 w)
-            echo "$uuid0\n$uuid1\n$uuid2\n" > /tmp/whiptail_input
+            echo -e "$uuid0\n$uuid1\n$uuid2\n" > /tmp/whiptail_input
             whiptail --title "UUID" --textbox /tmp/whiptail_input 8 78
             rm /tmp/whiptail_input
             ;;
@@ -100,20 +99,20 @@ while true; do
             input_current=$(read_register $INPUT_CURRENT w)
             battery_current=$(read_register $BATTERY_CURRENT w)
 
-            echo "Output Voltage: $((output_voltage)) mV\nInput Voltage: $((input_voltage)) mV\nBattery Voltage: $((battery_voltage)) mV\nMCU Voltage: $((mcu_voltage)) mV\nOutput Current: $((output_current)) mA\nInput Current: $((input_current)) mA\nBattery Current: $((battery_voltage)) mA\n" > /tmp/whiptail_input
+            echo -e "Output Voltage: $((output_voltage)) mV\nInput Voltage: $((input_voltage)) mV\nBattery Voltage: $((battery_voltage)) mV\nMCU Voltage: $((mcu_voltage)) mV\nOutput Current: $((output_current)) mA\nInput Current: $((input_current)) mA\nBattery Current: $((battery_current)) mA\n" > /tmp/whiptail_input
             whiptail --title "Voltage and Current Values" --textbox /tmp/whiptail_input 20 78
             rm /tmp/whiptail_input
             ;;
         5)
             temperature=$(read_register $TEMPERATURE b)
-            echo "Temperature: $((temperature)) degree"> /tmp/whiptail_input
+            echo "Temperature: $((temperature)) degree" > /tmp/whiptail_input
             whiptail --title "Temperature" --textbox /tmp/whiptail_input 8 78
             rm /tmp/whiptail_input
             ;;
         6)
             cr1=$(read_register $CR1 b)
             cr2=$(read_register $CR2 b)
-            echo "CR1: $cr1\nCR2: $cr2\n" > /tmp/whiptail_input
+            echo -e "CR1: $cr1\nCR2: $cr2\n" > /tmp/whiptail_input
             whiptail --title "Control Registers" --textbox /tmp/whiptail_input 8 78
             rm /tmp/whiptail_input
             ;;

@@ -17,5 +17,5 @@ while True:
         for y in range(0, 240, 10):
             # drawRect(x, y, width, hight, color)
             tft.drawRect(x, y, 20, 20, 0x6058)
-            Device.sleep(2)
+            Device.sleep(200)
 

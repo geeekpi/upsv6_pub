@@ -8,6 +8,6 @@ while True:
     Device.sleep(500)
     
     for r in range(1, 120, 2):
-        tft.drawCircle(120, 120, r, 0xFC5A)
+        tft.drawCircle(120, 120, r, 0x0FEA)
     Device.sleep(200)
 

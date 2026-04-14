@@ -14,10 +14,10 @@ while True:
     Device.sleep(200)
 
     # drawline 
-    for x in range(0, 240, 10):
+    for x in range(0, 240, 20):
         for y in range(0, 240, 10):
             # drawLine(startx, starty, endx, endy, color)
-            tft.drawLine(x, y, x+10, y+10, 0x001C)
+            tft.drawLine(x, y, x+20, y+10, 0x00AC)
 
             # delay for a while
             Device.sleep(2)

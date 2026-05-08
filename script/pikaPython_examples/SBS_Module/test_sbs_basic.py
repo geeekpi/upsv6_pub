@@ -1,7 +1,7 @@
 from UPS import SBS, I2C, Device
 
 
-SBS(I2C, 0x0a)
+SBS.init(I2C, 0x0a)
 
 if not SBS.ping():
     print("No SBS device found!")

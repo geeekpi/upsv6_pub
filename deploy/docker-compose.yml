@@ -1,0 +1,36 @@
+services:
+  influxdb3-core:
+    image: influxdb:3.8-core
+    container_name: influxdb3-core
+    command:
+      - influxdb3
+      - serve
+      - --node-id
+      - rpi-influx
+      - --object-store
+      - file
+      - --data-dir
+      - /var/lib/influxdb3
+    ports:
+      - "8181:8181"
+    volumes:
+      - influxdb3-data:/var/lib/influxdb3
+    restart: unless-stopped
+    stop_grace_period: 60s
+
+  grafana:
+    image: grafana/grafana:12.2.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-change-me}
+      GF_FEATURE_TOGGLES_ENABLE: ${GF_FEATURE_TOGGLES_ENABLE:-newInfluxDSConfigPageDesign}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  influxdb3-data:
+  grafana-data:

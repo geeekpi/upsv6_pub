@@ -1,0 +1,15 @@
+[Unit]
+Description=UPS Power Guard for 52Pi/GeekPi UPS V6
+After=multi-user.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=-/etc/default/ups-power-guard
+ExecStart=/usr/bin/python3 /usr/local/sbin/ups_power_guard.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

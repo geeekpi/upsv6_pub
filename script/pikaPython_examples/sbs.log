@@ -1,0 +1,73 @@
+⚙️ Retry settings: max=30, sub=3, delay=10.0ms
+📝 Output length: 1024 bytes
+[WARN] Read-back mismatch after write, retrying... 🔄
+📤 Device output:
+
+--- ADDR ---
+Addr:  10
+
+--- Voltage ---
+Voltage: 9899 mV
+--- Current ---
+Current: -1 mA
+---Average  Current ---
+Average Current: 252 mA
+Discharging: 1
+--- SOC ---
+RSOC: 59 %
+--- ASCP ---
+ASCP: -1 %
+--- Temp ---
+Temp: 29.700000 C
+------------------------------
+
+--- ADDR ---
+Addr:  10
+
+--- Voltage ---
+--- Current ---
+Current: 240 mA
+---Average  Current ---
+Average Current: -1 mA
+Discharging: 0
+--- SOC ---
+RSOC: -1 %
+--- ASCP ---
+ASCP: 59 %
+--- Temp ---
+Temp: -273.300000 C
+------------------------------
+
+--- ADDR ---
+Addr:  10
+
+--- Voltage ---
+Voltage: ¦899 mV
+--- Current ---
+Current: -1 mA
+---Average  Current ---
+Average Current: 272 mA
+Discharging: 1
+--- SOC ---
+RSOC: 59 %
+--- ASCP ---
+ASCP: -1 %
+--- Temp ---
+Temp: 29.600000 C
+------------------------------
+
+--- ADDR ---
+Addr:  10
+
+--- Voltage ---
+--- Current ---
+Current: 240 mA
+---Average  Current ---
+Average Current: -1 mA
+Discharging: 0
+--- SOC ---
+RSOC: -1 %
+--- ASCP ---
+ASCP: 59 %
+--- Temp ---
+T

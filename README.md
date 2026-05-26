@@ -37,5 +37,6 @@ Navigate to `3 Interface Options` -> `I2C` -> `YES` -> `OK` -> `Finished`:
 * [PikaPython_Examples_democodes](./script/pikaPython_examples/README.md)
 * [TFT Module](./script/pikaPython_examples/TFT_Module/README.md)
 * [SATA Power Module](./script/pikaPython_examples/SATAPower/README.md) 
+* [Smart Battery System](./script/pikaPython_examples/SBS_Module/README.md)
 ## Have fun!
 o(*￣▽￣*)ブ 
